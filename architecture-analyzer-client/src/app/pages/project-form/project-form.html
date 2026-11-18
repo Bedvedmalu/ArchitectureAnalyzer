@@ -1,0 +1,116 @@
+
+<section class="project-form-page">
+
+  <a routerLink="/projects" class="back-link">
+    ← Вернуться к проектам
+  </a>
+
+  <h1>
+    {{ isEdit() ? 'Редактирование проекта' : 'Создание проекта' }}
+  </h1>
+
+  @if (isLoading()) {
+
+  <p>Загрузка проекта...</p>
+
+  } @else if (loadError()) {
+
+  <p class="form-error" role="alert">
+    {{ loadError() }}
+  </p>
+
+  } @else {
+
+  <form class="project-form"
+        [formGroup]="projectForm"
+        (ngSubmit)="onSubmit()">
+
+    <div class="form-field">
+
+      <label for="projectName">Название проекта</label>
+
+      <input id="projectName"
+             type="text"
+             formControlName="projectName"
+             placeholder="Например, ArchitectureAnalyzer" />
+
+      @if (projectForm.controls.projectName.touched) {
+
+      @if (projectForm.controls.projectName.hasError('required')) {
+      <small class="field-error">
+        Название проекта обязательно.
+      </small>
+      }
+
+      @if (projectForm.controls.projectName.hasError('maxlength')) {
+      <small class="field-error">
+        Максимальная длина — 150 символов.
+      </small>
+      }
+
+      }
+
+    </div>
+
+    @if (!isEdit()) {
+
+    <div class="form-field">
+
+      <label for="projectUrl">URL репозитория</label>
+
+      <input id="projectUrl"
+             type="url"
+             formControlName="projectUrl"
+             placeholder="https://github.com/username/repository" />
+
+      @if (projectForm.controls.projectUrl.touched) {
+
+      @if (projectForm.controls.projectUrl.hasError('required')) {
+      <small class="field-error">
+        URL обязателен для заполнения.
+      </small>
+      }
+
+      @if (projectForm.controls.projectUrl.hasError('invalidUrl')) {
+      <small class="field-error">
+        Введи корректный HTTP/HTTPS URL.
+      </small>
+      }
+
+      }
+
+    </div>
+
+    }
+
+    @if (errorMessage()) {
+    <p class="form-error" role="alert">
+      {{ errorMessage() }}
+    </p>
+    }
+
+    <div class="form-actions">
+
+      <button type="submit"
+              class="save-button"
+              [disabled]="projectForm.invalid || isSaving()">
+
+        @if (isSaving()) {
+        Сохранение...
+        } @else {
+        {{ isEdit() ? 'Сохранить изменения' : 'Создать проект' }}
+        }
+
+      </button>
+
+      <a routerLink="/projects" class="cancel-link">
+        Отмена
+      </a>
+
+    </div>
+
+  </form>
+
+  }
+
+</section>

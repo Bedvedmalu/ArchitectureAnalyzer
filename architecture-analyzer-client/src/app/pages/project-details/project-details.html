@@ -1,0 +1,85 @@
+
+<section class="details-page">
+
+  <a routerLink="/projects" class="back-link">
+    ← К списку проектов
+  </a>
+
+  @if (isLoading()) {
+
+  <p>Загрузка информации о проекте...</p>
+
+  } @else if (errorMessage()) {
+
+  <p class="error-message" role="alert">
+    {{ errorMessage() }}
+  </p>
+
+  } @else if (project(); as projectData) {
+
+  <h1>{{ projectData.projectName }}</h1>
+
+  <div class="project-info">
+    <p>
+      <strong>ID:</strong>
+      {{ projectData.id }}
+    </p>
+
+    <p>
+      <strong>Язык программирования:</strong>
+      {{ projectData.projectLanguage }}
+    </p>
+
+    <p>
+      <strong>Дата загрузки:</strong>
+      {{ projectData.uploadDate | date:'dd.MM.yyyy HH:mm' }}
+    </p>
+  </div>
+
+  @if (health(); as metrics) {
+
+  <h2>Показатели качества</h2>
+
+  <div class="metrics-grid">
+
+    <div class="metric-card">
+      <span>Оценка качества</span>
+      <strong>{{ metrics.healthScore }} / 100</strong>
+    </div>
+
+    <div class="metric-card">
+      <span>Всего классов</span>
+      <strong>{{ metrics.totalClassesCount }}</strong>
+    </div>
+
+    <div class="metric-card">
+      <span>Сложных классов</span>
+      <strong>{{ metrics.complexClassesCount }}</strong>
+    </div>
+
+  </div>
+
+  <div class="health-section">
+    <h3>Состояние проекта</h3>
+
+    <div class="progress-background"
+         role="progressbar"
+         aria-label="Оценка качества проекта"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         [attr.aria-valuenow]="metrics.healthScore">
+
+      <div class="progress-fill"
+           [style.width.%]="metrics.healthScore">
+      </div>
+
+    </div>
+
+    <p>Оценка: {{ metrics.healthScore }} из 100</p>
+  </div>
+
+  }
+
+  }
+
+</section>

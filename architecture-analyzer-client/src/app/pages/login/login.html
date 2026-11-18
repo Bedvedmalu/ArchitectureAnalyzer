@@ -1,0 +1,54 @@
+
+<section class="login-page">
+  <form class="login-form"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()">
+
+    <h1>Авторизация</h1>
+
+    <div class="form-field">
+      <label for="username">Логин</label>
+
+      <input id="username"
+             type="text"
+             formControlName="username"
+             autocomplete="username" />
+
+      @if (loginForm.controls.username.touched &&
+      loginForm.controls.username.invalid) {
+      <small class="error">
+        Введи логин длиной не менее 3 символов.
+      </small>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="password">Пароль</label>
+
+      <input id="password"
+             type="password"
+             formControlName="password"
+             autocomplete="current-password" />
+
+      @if (loginForm.controls.password.touched &&
+      loginForm.controls.password.invalid) {
+      <small class="error">
+        Пароль обязателен для заполнения.
+      </small>
+      }
+    </div>
+
+    @if (errorMessage()) {
+    <p class="error" role="alert">
+      {{ errorMessage() }}
+    </p>
+    }
+
+    <button type="submit"
+            [disabled]="isLoading()">
+
+      {{ isLoading() ? 'Выполняется вход...' : 'Войти' }}
+    </button>
+
+  </form>
+</section>

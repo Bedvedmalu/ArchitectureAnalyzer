@@ -1,0 +1,121 @@
+
+<section class="analytics-page">
+
+  <div class="analytics-heading">
+    <h1>Аналитика проектов</h1>
+
+    <button type="button"
+            (click)="loadAnalytics()"
+            [disabled]="isLoading()">
+      Обновить аналитику
+    </button>
+  </div>
+
+  @if (isLoading()) {
+
+  <p>Загрузка аналитики...</p>
+
+  } @else if (errorMessage()) {
+
+  <p class="error-message" role="alert">
+    {{ errorMessage() }}
+  </p>
+
+  } @else if (hasLoaded()) {
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <span>Рискованных проектов</span>
+      <strong>{{ riskyProjects().length }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Рискованных классов</span>
+      <strong>{{ totalRiskyClasses() }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Всего строк кода</span>
+      <strong>{{ totalLines() }}</strong>
+    </div>
+
+  </div>
+
+  <h2>Проекты с повышенной сложностью</h2>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Название проекта</th>
+          <th>Рискованных классов</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (project of riskyProjects(); track project.id) {
+        <tr>
+          <td>{{ project.id }}</td>
+          <td>
+            <a [routerLink]="['/projects', project.id]">
+              {{ project.projectName }}
+            </a>
+          </td>
+          <td>{{ project.riskyClassesCount }}</td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="3">
+            Рискованных проектов не найдено.
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Статистика строк кода</h2>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Проект</th>
+          <th>Классов</th>
+          <th>Всего строк</th>
+          <th>Среднее</th>
+          <th>Минимум</th>
+          <th>Максимум</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of linesStats(); track item.id) {
+        <tr>
+          <td>
+            <a [routerLink]="['/projects', item.id]">
+              {{ item.projectName }}
+            </a>
+          </td>
+          <td>{{ item.totalClasses }}</td>
+          <td>{{ item.totalLines }}</td>
+          <td>{{ item.avgLines | number:'1.0-1' }}</td>
+          <td>{{ item.minLines }}</td>
+          <td>{{ item.maxLines }}</td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6">
+            Данные о строках кода отсутствуют.
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  }
+
+</section>

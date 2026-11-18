@@ -1,0 +1,278 @@
+
+<section class="projects-page" id="projects">
+
+
+  <div class="page-heading">
+    <div class="heading-content">
+
+      <div>
+        <h1>{{ title }}</h1>
+        <p class="description">
+          Управление и просмотр проектов ArchitectureAnalyzer.
+        </p>
+      </div>
+
+      @if (isAdmin()) {
+      <a routerLink="/projects/new"
+         class="create-button">
+        + Создать проект
+      </a>
+      }
+
+    </div>
+  </div>
+
+
+  @if (actionError()) {
+  <p class="error-message" role="alert">
+    {{ actionError() }}
+  </p>
+  }
+
+  @if (isLoading()) {
+  <p class="status-message">Загрузка проектов...</p>
+
+  } @else if (errorMessage()) {
+  <p class="error-message" role="alert">
+    {{ errorMessage() }}
+  </p>
+
+  <button type="button" (click)="loadProjects()">
+    Повторить загрузку
+  </button>
+
+  } @else if (hasLoaded()) {
+
+  <div class="toolbar">
+
+    <div class="filters">
+      <div class="filter-field">
+        <label for="search">Поиск</label>
+
+        <input id="search"
+               type="search"
+               placeholder="Название или ID проекта"
+               [value]="searchQuery()"
+               (input)="onSearchInput($event)" />
+      </div>
+
+      <div class="filter-field">
+        <label for="language">Язык</label>
+
+        <select id="language"
+                [value]="selectedLanguage()"
+                (change)="onLanguageChange($event)">
+
+          <option value="all">Все языки</option>
+
+          @for (language of languages(); track language) {
+          <option [value]="language">
+            {{ language }}
+          </option>
+          }
+
+        </select>
+      </div>
+
+      <button type="button"
+              class="secondary-button"
+              (click)="clearFilters()">
+        Сбросить фильтры
+      </button>
+    </div>
+
+    <div class="view-controls">
+      <button type="button"
+              [class.active]="viewMode() === 'table'"
+              (click)="viewMode.set('table')">
+        Таблица
+      </button>
+
+      <button type="button"
+              [class.active]="viewMode() === 'cards'"
+              (click)="viewMode.set('cards')">
+        Карточки
+      </button>
+    </div>
+
+  </div>
+
+  <div class="list-settings">
+
+    <span>
+      Найдено: {{ visibleProjects().length }}
+      из {{ projects().length }}
+    </span>
+
+    <div class="sort-controls">
+      <label for="sort-field">Сортировать по:</label>
+
+      <select id="sort-field"
+              [value]="sortField()"
+              (change)="onSortChange($event)">
+        <option value="id">ID</option>
+        <option value="projectName">Названию</option>
+        <option value="projectLanguage">Языку</option>
+        <option value="uploadDate">Дате загрузки</option>
+      </select>
+
+      <button type="button"
+              class="secondary-button"
+              (click)="toggleSortDirection()">
+        {{ sortDirection() === 'asc' ? '↑' : '↓' }}
+      </button>
+
+      <button type="button"
+              class="secondary-button"
+              (click)="loadProjects()">
+        Обновить
+      </button>
+    </div>
+
+  </div>
+
+  @if (visibleProjects().length === 0) {
+
+  <div class="empty-state">
+    <p>Проекты не найдены.</p>
+    <span>Измени параметры поиска или фильтра.</span>
+  </div>
+
+  } @else if (viewMode() === 'table') {
+
+  <div class="table-wrapper">
+
+    <table class="projects-table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <button type="button" (click)="sortBy('id')">
+              ID {{ sortIndicator('id') }}
+            </button>
+          </th>
+
+          <th scope="col">
+            <button type="button"
+                    (click)="sortBy('projectName')">
+              Название {{ sortIndicator('projectName') }}
+            </button>
+          </th>
+
+          <th scope="col">
+            <button type="button"
+                    (click)="sortBy('projectLanguage')">
+              Язык {{ sortIndicator('projectLanguage') }}
+            </button>
+          </th>
+
+          <th scope="col">
+            <button type="button"
+                    (click)="sortBy('uploadDate')">
+              Дата {{ sortIndicator('uploadDate') }}
+            </button>
+          </th>
+
+          @if (isAdmin()) {
+          <th scope="col">Действия</th>
+          }
+
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (project of visibleProjects(); track project.id) {
+        <tr>
+          <td>{{ project.id }}</td>
+          <td>
+            <a [routerLink]="['/projects', project.id]">
+              {{ project.projectName }}
+            </a>
+          </td>
+          <td>{{ project.projectLanguage || 'Не указан' }}</td>
+          <td>
+            {{ project.uploadDate | date:'dd.MM.yyyy HH:mm' }}
+          </td>
+
+          @if (isAdmin()) {
+          <td>
+            <div class="project-actions">
+
+              <a [routerLink]="['/projects', project.id, 'edit']"
+                 class="edit-button">
+                Изменить
+              </a>
+
+              <button type="button"
+                      class="delete-button"
+                      [disabled]="deletingId() !== null"
+                      (click)="deleteProject(project)">
+
+                {{ deletingId() === project.id ? 'Удаление...' : 'Удалить' }}
+              </button>
+
+            </div>
+          </td>
+          }
+
+        </tr>
+        }
+      </tbody>
+
+    </table>
+  </div>
+
+  } @else {
+
+  <div class="projects-grid">
+
+    @for (project of visibleProjects(); track project.id) {
+
+    <article class="project-card">
+      <div class="card-header">
+        <h2>
+          <a [routerLink]="['/projects', project.id]">
+            {{ project.projectName }}
+          </a>
+        </h2>
+        <span class="language-badge">
+          {{ project.projectLanguage || 'Не указан' }}
+        </span>
+      </div>
+
+      <p><strong>ID:</strong> {{ project.id }}</p>
+
+      <p>
+        <strong>Дата загрузки:</strong>
+        {{ project.uploadDate | date:'dd.MM.yyyy HH:mm' }}
+      </p>
+
+      @if (isAdmin()) {
+      <div class="project-actions">
+
+        <a [routerLink]="['/projects', project.id, 'edit']"
+           class="edit-button">
+          Изменить
+        </a>
+
+        <button type="button"
+                class="delete-button"
+                [disabled]="deletingId() !== null"
+                (click)="deleteProject(project)">
+
+          {{ deletingId() === project.id ? 'Удаление...' : 'Удалить' }}
+        </button>
+
+      </div>
+      }
+
+    </article>
+
+    }
+
+  </div>
+
+  }
+
+  }
+
+</section>

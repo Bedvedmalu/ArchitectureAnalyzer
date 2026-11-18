@@ -1,0 +1,6 @@
+@ArchitectureAnalyzer_HostAddress = http://localhost:5191
+
+GET {{ArchitectureAnalyzer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

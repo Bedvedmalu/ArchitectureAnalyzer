@@ -1,0 +1,28 @@
+
+<nav class="navigation" aria-label="Главное меню">
+  <div class="nav-container">
+
+    <a routerLink="/projects">Проекты</a>
+    <a routerLink="/analytics">Аналитика</a>
+    <a href="#about">О приложении</a>
+
+    @if (authService.isLoggedIn()) {
+
+    <span class="user-role">
+      Роль: {{ authService.role() }}
+    </span>
+
+    <button type="button" (click)="logout()">
+      Выйти
+    </button>
+
+    } @else {
+
+    <a routerLink="/login">
+      Войти
+    </a>
+
+    }
+
+  </div>
+</nav>
